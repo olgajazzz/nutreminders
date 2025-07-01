@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from telegram import Update
+from telegram import *
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
