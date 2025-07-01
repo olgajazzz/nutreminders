@@ -1,13 +1,12 @@
-import pandas as pd
-from telegram import Bot
-from telegram.ext import Updater, CommandHandler
-from apscheduler.schedulers.background import BackgroundScheduler
-import datetime
 import os
+import pandas as pd
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # Загрузка идей
 ideas = pd.read_csv("ideas.csv")["idea"].tolist()
-# Файл для хранения текущего индекса
 INDEX_FILE = "current_index.txt"
+subscribers = set()
 def get_current_index():
     if not os.path.exists(INDEX_FILE):
         return 0
@@ -16,31 +15,27 @@ def get_current_index():
 def save_current_index(index):
     with open(INDEX_FILE, "w") as f:
         f.write(str(index))
-# Telegram токен
-TOKEN = "8136104361:AAGSDeVBWWQPXfJonPAkjp3MaB9A81tSDnUos.getenv"
-bot = Bot(token=TOKEN)
-# Список пользователей
-subscribers = set()
-def start(update, context):
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     subscribers.add(chat_id)
-    context.bot.send_message(chat_id=chat_id, text="Привет! Я буду присылать тебе идеи по питанию каждый день 😊")
-def send_daily_idea():
+    await context.bot.send_message(chat_id=chat_id, text="Привет! Я буду присылать тебе идеи по питанию каждый день 😊")
+async def send_daily_idea(app):
     index = get_current_index()
     if index >= len(ideas):
-        return  # Все идеи закончились
+        return
     idea = ideas[index]
     for chat_id in subscribers:
-        bot.send_message(chat_id=chat_id, text=f"🍏 Идея дня:\n{idea}")
+        await app.bot.send_message(chat_id=chat_id, text=f"🍏 Идея дня:\n{idea}")
     save_current_index(index + 1)
-# Настройка планировщика
-scheduler = BackgroundScheduler()
-scheduler.add_job(send_daily_idea, 'cron', hour=9)  # каждый день в 9:00
-scheduler.start()
-# Запуск бота
-updater = Updater(token=TOKEN, use_context=True)
-dp = updater.dispatcher
-dp.add_handler(CommandHandler("start", start))
-print("Бот запущен...")
-updater.start_polling()
-updater.idle()
+async def main():
+    TOKEN = os.getenv("BOT_TOKEN")
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(send_daily_idea, "cron", hour=9, args=[app])
+    scheduler.start()
+    print("Бот запущен...")
+    await app.run_polling()
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(main())
