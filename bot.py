@@ -4,8 +4,8 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-# Load ideas from CSV
-ideas = pd.read_csv("ideas.csv")["idea"].dropna().tolist()
+# Загрузка идей из CSV
+ideas = pd.read_csv("ideas.csv")["idea"].tolist()
 INDEX_FILE = "current_index.txt"
 subscribers = set()
 
@@ -30,7 +30,8 @@ async def send_daily_idea(app):
         return
     idea = ideas[index]
     for chat_id in subscribers:
-        await app.bot.send_message(chat_id=chat_id, text=f"Идея дня: {idea}")
+        await app.bot.send_message(chat_id=chat_id, text=f"🍏 Идея дня:
+{idea}")
     save_current_index(index + 1)
 
 async def main():
