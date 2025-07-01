@@ -22,7 +22,7 @@ def save_current_index(index):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.effective_chat.id
     subscribers.add(chat_id)
-    await context.bot.send_message(chat_id=chat_id, text="Привет! Я буду присылать тебе идеи по питанию каждый день ")
+    await context.bot.send_message(chat_id=chat_id, text="Привет! Я буду присылать тебе идеи по питанию каждый день 😊")
 
 async def send_daily_idea(app):
     index = get_current_index()
@@ -30,7 +30,7 @@ async def send_daily_idea(app):
         return
     idea = ideas[index]
     for chat_id in subscribers:
-        await app.bot.send_message(chat_id=chat_id, text=f"Идея дня:
+        await app.bot.send_message(chat_id=chat_id, text=f"🍏 Идея дня:
 {idea}")
     save_current_index(index + 1)
 
