@@ -17,7 +17,7 @@ def save_current_index(index):
     with open(INDEX_FILE, "w") as f:
         f.write(str(index))
 # Telegram токен
-TOKEN = "YOUR_BOT_TOKEN"
+TOKEN = "8136104361:AAGSDeVBWWQPXfJonPAkjp3MaB9A81tSDnUos.getenv"
 bot = Bot(token=TOKEN)
 # Список пользователей
 subscribers = set()
