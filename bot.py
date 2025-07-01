@@ -30,7 +30,8 @@ async def send_daily_idea(app):
         return
     idea = ideas[index]
     for chat_id in subscribers:
-        await app.bot.send_message(chat_id=chat_id, text=f"{idea}")
+        await app.bot.send_message(chat_id=chat_id, text=f"🍏 Идея дня:
+{idea}")
     save_current_index(index + 1)
 
 async def main():
